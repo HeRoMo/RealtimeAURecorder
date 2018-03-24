@@ -1,5 +1,8 @@
 // 日付の切り替わり時間。午前4時にシートを切り替える。
 const DATE_CHANGE_HOUR = 4;
+const TIME_ZONE = 'JST';
+const DATE_FORMAT = 'yyyy-MM-dd';
+const Z_COLUMN_POSITION = 26;
 
 /**
  * Google Drive上のSpreadSheetに書き込むためのクラス。
@@ -69,7 +72,7 @@ class Sheets {
       const headers = ['日時', 'アクティブユーザ数', 'STATUS'];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       const firstColumn = headers.length + 1;
-      sheet.deleteColumns(firstColumn, 26 - headers.length);
+      sheet.deleteColumns(firstColumn, Z_COLUMN_POSITION - headers.length);
     }
     return sheet;
   }
@@ -85,7 +88,7 @@ class Sheets {
     if (!dateInt) throw new Error('Invalid datetime');
     const date = new Date(dateInt);
     date.setHours(date.getHours() - DATE_CHANGE_HOUR); // 日替わり時間分ずらす
-    const yearMonthDate = Utilities.formatDate(date, 'JST', 'yyyy-MM-dd');
+    const yearMonthDate = Utilities.formatDate(date, TIME_ZONE, DATE_FORMAT);
     const sheet = this.getSheet(yearMonthDate);
     sheet.appendRow([data.datetime, data.activeUsers, data.status]);
   }
