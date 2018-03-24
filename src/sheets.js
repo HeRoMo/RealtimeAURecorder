@@ -54,7 +54,6 @@ class Sheets {
 
   /**
    * yearMonthDateに対応した名称のシートを取得する。なければ作る。
-   * 日替わりの時間は DATE_CHANGE_HOUR で指定。
    * @param  {String} yearMonthDate yyyy-mm-dd 形式の文字列。
    * @return {Sheet}  取得、もしくは作成したSheetオブジェクト
    */
@@ -64,17 +63,13 @@ class Sheets {
     }
     const yearMonth = RegExp.$1;
     const ss = this.getSpreadSheetFile(yearMonth);
-    // const date = new Date();
-    // date.setHours(date.getHours() - DATE_CHANGE_HOUR);
-    // const sheetName = Utilities.formatDate(date, 'JST', "'au_'yyyyMMdd");
     let sheet = ss.getSheetByName(yearMonthDate);
     if (!sheet) {
       sheet = ss.insertSheet(yearMonthDate, 0);
       const headers = ['日時', 'アクティブユーザ数', 'STATUS'];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       const firstColumn = headers.length + 1;
-      const lastColumn = sheet.getLastColumn();
-      sheet.deleteColumns(firstColumn, lastColumn - firstColumn);
+      sheet.deleteColumns(firstColumn, 26 - headers.length);
     }
     return sheet;
   }
@@ -82,10 +77,15 @@ class Sheets {
   /**
    * データを追加する。
    * 追加先は data.datetimeの日付部分（yyyy-mm-dd）に対応するシートの末尾。
-   * @param  {[type]} data {datatime, activeUsers, status}
+   * 日替わりの時間は DATE_CHANGE_HOUR で指定する。
+   * @param  {Object} data {datatime, activeUsers, status}
    */
   appendData(data) {
-    const yearMonthDate = data.datetime.split(' ')[0];
+    const dateInt = Date.parse(data.datetime.replace(' ', 'T'));
+    if (!dateInt) throw new Error('Invalid datetime');
+    const date = new Date(dateInt);
+    date.setHours(date.getHours() - DATE_CHANGE_HOUR); // 日替わり時間分ずらす
+    const yearMonthDate = Utilities.formatDate(date, 'JST', 'yyyy-MM-dd');
     const sheet = this.getSheet(yearMonthDate);
     sheet.appendRow([data.datetime, data.activeUsers, data.status]);
   }
