@@ -1,15 +1,12 @@
 import './appsscript.json';
 
+import fetchActiveUsers from './ga';
+
 const DATE_CHANGE_HOUR = 4; // 日付の切り替わり時間。午前4時にシートを切り替える
 
 function getActiveUsers() {
-  const ids = process.env.GA_VIEW_ID;
-  const metrics = 'rt:activeUsers';
-  const time = Utilities.formatDate(new Date(), 'JST', 'yyyy-MM-dd HH:mm:ss');
-  const res = Analytics.Data.Realtime.get(ids, metrics);
-  const activeUsers = res.totalsForAllResults['rt:activeUsers'];
-  Logger.log({ time, activeUsers });
-  return { time, activeUsers };
+  const au = fetchActiveUsers(process.env.GA_VIEW_ID);
+  Logger.log(au);
 }
 
 /**
