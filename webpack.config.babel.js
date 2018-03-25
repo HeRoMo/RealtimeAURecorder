@@ -1,4 +1,5 @@
 import GasPlugin from 'gas-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 import path from 'path';
 
@@ -32,5 +33,10 @@ export default {
   },
   plugins: [
     new GasPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'index.html',
+      inject: false,
+    }),
   ],
 };
