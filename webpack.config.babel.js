@@ -1,5 +1,4 @@
 import GasPlugin from 'gas-webpack-plugin';
-import Dotenv from 'dotenv-webpack';
 
 import path from 'path';
 
@@ -33,6 +32,5 @@ export default {
   },
   plugins: [
     new GasPlugin(),
-    new Dotenv(),
   ],
 };
