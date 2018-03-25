@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "login": "./node_modules/.bin/clasp login",
-    "init_gas": "./node_modules/.bin/clasp create toggl2rm && node ./utils/modify_clasp_json.js && rm ./appsscript.json",
+    "init_gas": "./node_modules/.bin/clasp create RealtimeAuRecorder",
+    "postinit_gas": "node ./utils/modify_clasp_json.js && rm ./appsscript.json",
     "build": "webpack",
     "cleanup": "rm -f dest/*",
     "deploy": "./node_modules/.bin/clasp push"
