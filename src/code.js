@@ -1,5 +1,3 @@
-import './appsscript.json';
-
 import getSettings from './settings';
 import fetchActiveUsers from './ga';
 import Sheets from './sheets';
