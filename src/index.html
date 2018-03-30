@@ -1,11 +1,48 @@
 <html>
 <head>
-  <style type="text/css">
-  </style>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
-  
+  <h1>グラフ<h1>
+  <div>
+    <select id="name">
+      <? for(var i = 0; i < settings.length; i++) { ?>
+        <option value="<?=settings[i].name?>"><?=settings[i].name?></option>
+      <? } ?>
+    </select>
+  </div>
+  <div id="curve_chart" style="width: 900px; height: 600px"></div>
   <script type="text/javascript">
+    var auData = JSON.parse(<?= data ?>);
+    auData = auData.map(row => { return [new Date(row[0]), row[1]]})
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('datetime', '日時');
+      data.addColumn('number', 'Realtime Active Users');
+      data.addRows(auData);
+
+      var options = {
+        title: 'アクティブユーザ',
+        legend: { position: 'bottom' },
+        width: '900',
+        height: '600',
+        hAxis: {
+          format: 'HH:mm',
+          gridlines: {count: 15}
+        },
+        timeZone: 9
+      };
+
+      var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
+      format.format(data, 0);
+
+      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+      chart.draw(data, options);
+    }
   </script>
 </body>
 </html>

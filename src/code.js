@@ -21,4 +21,16 @@ function exec() {
   settings.forEach(setting => recordAU(setting));
 }
 
+function setUp() {
+  const scriptProperties = PropertiesService.getScriptProperties();
+  scriptProperties.setProperty('settingsSsId', SpreadsheetApp.getActiveSpreadsheet().getId());
+}
+
+function getSettingsSsId() {
+  const scriptProperties = PropertiesService.getScriptProperties();
+  return scriptProperties.getProperty('settingsSsId');
+}
+
 global.exec = exec;
+global.setUp = setUp;
+global.getSettingsSsId = getSettingsSsId;

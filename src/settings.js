@@ -21,12 +21,16 @@ function values2object(values) {
  * 設定を取得する。
  * @return {Array[Object]} 設定のリスト
  */
-function getSettings() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function getSettings(ssId) {
+  let ss;
+  if (ssId) {
+    ss = SpreadsheetApp.openById(ssId);
+  } else {
+    ss = SpreadsheetApp.getActiveSpreadsheet();
+  }
   const settingSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
   const values = settingSheet.getDataRange().getValues();
   const data = values2object(values);
-  Logger.log(data);
   return data;
 }
 
