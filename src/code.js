@@ -1,4 +1,4 @@
-import getSettings from './settings';
+import Settings from './settings';
 import fetchActiveUsers from './ga';
 import Sheets from './sheets';
 
@@ -17,20 +17,13 @@ function recordAU(setting) {
  * 定期的に実行する関数
  */
 function exec() {
-  const settings = getSettings();
+  const settings = new Settings().getAll();
   settings.forEach(setting => recordAU(setting));
 }
 
 function setUp() {
-  const scriptProperties = PropertiesService.getScriptProperties();
-  scriptProperties.setProperty('settingsSsId', SpreadsheetApp.getActiveSpreadsheet().getId());
-}
-
-function getSettingsSsId() {
-  const scriptProperties = PropertiesService.getScriptProperties();
-  return scriptProperties.getProperty('settingsSsId');
+  Settings.setUp();
 }
 
 global.exec = exec;
 global.setUp = setUp;
-global.getSettingsSsId = getSettingsSsId;
