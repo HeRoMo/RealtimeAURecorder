@@ -30,7 +30,7 @@
       0% {transform: rotate(0deg);}
       100% {transform: rotate(360deg);}
     }
-    select.processing + .loading {
+    .processing + .loading {
       display: inline-block;
     }
     #chart {
@@ -184,7 +184,8 @@
     });
 
     document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
-      document.querySelector('#chart').innerHTML = '';
+      const loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>'
+      document.querySelector('#chart').innerHTML = loadingMsg;
       document.querySelector('#ss-url').href = '';
 
       var name = document.querySelector("select#name").value;
