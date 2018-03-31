@@ -1,4 +1,5 @@
 const SETTINGS_SHEET_NAME = 'SETTINGS';
+const TIMEZONE = 9;
 
 /**
  * Range#getValues で取得した2次元配列をオブジェクトの配列に変換する。
@@ -71,5 +72,7 @@ class Settings {
     return setting;
   }
 }
+
+Settings.TIMEZONE = TIMEZONE;
 
 export default Settings;
