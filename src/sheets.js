@@ -22,13 +22,35 @@ class Sheets {
     this.baseDir = DriveApp.getFolderById(this.baseDirId);
   }
 
+  /**
+   * 西暦の一覧を取得する
+   * @return {Object} {name, value}
+   */
   getYears() {
     const folders = this.baseDir.getFolders();
     const years = [];
     while (folders.hasNext()) {
-      years.push(folders.next().getName());
+      const name = folders.next().getName();
+      years.push({ name, value: name });
     }
     return years;
+  }
+
+  /**
+   * 指定された年の月の一覧を取得する
+   * @param  {Integer} year 西暦
+   * @return {Object}  {name, value}
+   */
+  getMonthsOf(year) {
+    const yearDir = this.getYearDir(year);
+    const folders = yearDir.getFilesByType(MimeType.GOOGLE_SHEETS);
+    const yearMonths = [];
+    while (folders.hasNext()) {
+      const value = folders.next().getName();
+      const month = value.split('-')[1];
+      yearMonths.push({ name: month, value });
+    }
+    return yearMonths;
   }
 
   /**

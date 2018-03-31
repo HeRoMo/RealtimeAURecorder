@@ -18,6 +18,7 @@
         <option value="<?=years[i]?>"><?=years[i]?></option>
       <? } ?>
     </select>
+    <select id="yearMonth"></select>
   </div>
   <div id="curve_chart" style="width: 900px; height: 600px"></div>
   <script type="text/javascript">
@@ -57,9 +58,44 @@
       dispChart(auData);
     }
 
+    function insertOptions(selector, list){
+      var yearSelect = document.querySelector(selector)
+      var yearOptions = '';
+      for (var i = 0; i < list.length; i++){
+        var option = (i == 0) ?
+          '<option value="'+list[i].value+'" selected>'+list[i].name+'</option>' :
+          '<option value="'+list[i].value+'">'+list[i].name+'</option>';
+        yearOptions = yearOptions + option;
+      }
+      yearSelect.innerHTML = yearOptions;
+    }
+
     document.querySelector("select#name").addEventListener('change',function(e){
-      console.log(e.target.value);
-    })
+      function onSuccess(years){
+        insertOptions('select#year', years)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYears(name)
+    });
+
+    document.querySelector('select#year').addEventListener('change',function(e){
+      function onSuccess(yearMonths){
+        insertOptions('select#yearMonth', yearMonths)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = document.querySelector("select#name").value;
+      var year = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYearMonths(name, year)
+    });
   </script>
 </body>
 </html>
