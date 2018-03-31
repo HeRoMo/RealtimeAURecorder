@@ -19,6 +19,7 @@
       <? } ?>
     </select>
     <select id="yearMonth"></select>
+    <select id="yearMonthDate"></select>
   </div>
   <div id="curve_chart" style="width: 900px; height: 600px"></div>
   <script type="text/javascript">
@@ -68,6 +69,7 @@
         yearOptions = yearOptions + option;
       }
       yearSelect.innerHTML = yearOptions;
+      yearSelect.dispatchEvent(new Event('change'));
     }
 
     document.querySelector("select#name").addEventListener('change',function(e){
@@ -95,6 +97,36 @@
         .withSuccessHandler(onSuccess)
         .withFailureHandler(onFailure)
         .getYearMonths(name, year)
+    });
+
+    document.querySelector('select#yearMonth').addEventListener('change',function(e){
+      function onSuccess(yearMonthDates){
+        insertOptions('select#yearMonthDate', yearMonthDates)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = document.querySelector("select#name").value;
+      var yearMonth = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYearMonthDates(name, yearMonth)
+    });
+
+    document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
+      function onSuccess(dataJson){
+        const data = JSON.parse(dataJson);
+        dispChart(data);
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = document.querySelector("select#name").value;
+      var yearMonthDate = e.target.value;
+
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getDataJson(name, yearMonthDate)
     });
   </script>
 </body>

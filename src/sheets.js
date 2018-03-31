@@ -53,6 +53,18 @@ class Sheets {
     return yearMonths;
   }
 
+  getDatesOf(yearMonth) {
+    const yearMonthFile = this.getSpreadSheetFile(yearMonth);
+    const sheets = yearMonthFile.getSheets();
+    Logger.log(sheets);
+    const dates = sheets.map((sheet) => {
+      const value = sheet.getName();
+      const name = value.split('-')[2];
+      return { name, value };
+    });
+    return dates;
+  }
+
   /**
    * year に対応した名称のフォルダを取得する。なければ作る。
    * @param  {Date}   [year=new Date().getYear()] [description]

@@ -4,13 +4,19 @@ import Sheets from './sheets';
 const settings = new Settings();
 
 function getData(name, yearMonthDate) {
-  const setting = new Settings().get(name);
+  const setting = settings.get(name);
   const s = new Sheets(setting.base_dir);
   const sheet = s.getSheet(yearMonthDate);
   const range = sheet.getDataRange();
   const data = range.getValues();
   data.shift();
-  return data.map(row => row.slice(0, 2));
+  const result = data.map(row => row.slice(0, 2));
+  return result;
+}
+
+function getDataJson(name, yearMonthDate) {
+  const data = getData(name, yearMonthDate);
+  return JSON.stringify(data);
 }
 
 function doGet(e) {
@@ -48,6 +54,14 @@ function getYearMonths(name, year) {
   return months.sort((a, b) => (b.name - a.name));
 }
 
+function getYearMonthDates(name, yearMonth) {
+  const dataSheets = new Sheets(settings.get(name).base_dir);
+  const dates = dataSheets.getDatesOf(yearMonth);
+  return dates.sort((a, b) => (b.name - a.name));
+}
+
 global.doGet = doGet;
 global.getYears = getYears;
 global.getYearMonths = getYearMonths;
+global.getYearMonthDates = getYearMonthDates;
+global.getDataJson = getDataJson;
