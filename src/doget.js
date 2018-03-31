@@ -13,17 +13,22 @@ function getData(name, yearMonthDate) {
 
 function doGet(e) {
   const params = e.parameter;
+  const name = params.name;
+  const ymd = params.ymd;
 
   const settings = new Settings();
+  const dataSheets = new Sheets(settings.get(name).base_dir);
 
-  if (params.name) {
-    Logger.log(params.name);
+  let data = [];
+  if (name && ymd) {
+    data = getData(name, ymd);
   }
 
-  const data = getData('Qiita', '2018-03-28');
+  const years = dataSheets.getYears();
   const template = HtmlService.createTemplateFromFile('index');
   template.data = JSON.stringify(data);
-  template.settings = settings;
+  template.settings = settings.getAll();
+  template.years = years;
   return template.evaluate();
 }
 

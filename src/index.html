@@ -7,17 +7,20 @@
   <h1>グラフ<h1>
   <div>
     <select id="name">
+      <option>選択して下さい</option>
       <? for(var i = 0; i < settings.length; i++) { ?>
         <option value="<?=settings[i].name?>"><?=settings[i].name?></option>
+      <? } ?>
+    </select>
+
+    <select id="year">
+      <? for(var i = 0; i < years.length; i++) { ?>
+        <option value="<?=years[i]?>"><?=years[i]?></option>
       <? } ?>
     </select>
   </div>
   <div id="curve_chart" style="width: 900px; height: 600px"></div>
   <script type="text/javascript">
-    var auData = JSON.parse(<?= data ?>);
-    auData = auData.map(row => { return [new Date(row[0]), row[1]]})
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
       var data = new google.visualization.DataTable();
@@ -39,10 +42,24 @@
 
       var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
       format.format(data, 0);
-
       var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
       chart.draw(data, options);
     }
+
+    function dispChart(data){
+      auData = data.map(row => { return [new Date(row[0]), row[1]]})
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+    }
+
+    var auData = JSON.parse(<?= data ?>);
+    if(auData.length > 0){
+      dispChart(auData);
+    }
+
+    document.querySelector("select#name").addEventListener('change',function(e){
+      console.log(e.target.value);
+    })
   </script>
 </body>
 </html>

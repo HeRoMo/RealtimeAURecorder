@@ -22,6 +22,15 @@ class Sheets {
     this.baseDir = DriveApp.getFolderById(this.baseDirId);
   }
 
+  getYears() {
+    const folders = this.baseDir.getFolders();
+    const years = [];
+    while (folders.hasNext()) {
+      years.push(folders.next().getName());
+    }
+    return years;
+  }
+
   /**
    * year に対応した名称のフォルダを取得する。なければ作る。
    * @param  {Date}   [year=new Date().getYear()] [description]
