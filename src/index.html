@@ -34,11 +34,18 @@
       display: inline-block;
     }
     #chart {
-      width: 800px;
+      width: 1000px;
       height: 600px;
-      margin: 20px;
+      margin: 0px 20px;
     }
     a[href=""] { display: none; }
+    #reload {
+      width: 1000px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      text-align: right;
+    }
+    button[data-name=""] { display: none; }
   </style>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
@@ -67,10 +74,18 @@
       </div>
     </div>
   </fieldset>
+  <div id="reload">
+    <button data-name="", data-ymd="" class="btn blue">リロード</button>
+  </div>
   <div id="chart"></div>
   <a id="ss-url" href="" target="_blank">View Spreadsheet</a>
   <script type="text/javascript">
   (function(){
+    /**
+     * グラフを描画する関数を生成する。
+     * @param  {Object} auData {name, ymd, data, url}
+     * @return {Function} google.charts.setOnLoadCallbackに渡される関数
+     */
     function drawChart(auData) {
       return function(){
         var data = new google.visualization.DataTable();
@@ -84,23 +99,27 @@
           hAxis: {
             format: 'HH:mm',
             gridlines: { count: 12 },
-            minorGridlines: {
-              count: 7,
-            }
+            minorGridlines: { count: 7 }
           },
-          timeZone: 9,
+          timeZone: <?= timezone ?>,
           theme: 'maximized',
         };
-
 
         var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
         format.format(data, 0);
         var chart = new google.visualization.LineChart(document.querySelector('#chart'));
         chart.draw(data, options);
-        document.querySelector('#ss-url').href=auData.url
+        document.querySelector('#ss-url').href=auData.url;
+        var reloadButton = document.querySelector("#reload>button");
+        reloadButton.dataset.name = auData.name;
+        reloadButton.dataset.ymd = auData.ymd;
       }
     }
 
+    /**
+     * データをグラフとして表示する
+     * @param  {Object} data {name, ymd, data, url}
+     */
     function dispChart(data){
       var auData = Object.assign({}, data,
         {data: data.data.map(row => { return [new Date(row[0]), row[1]]})});
@@ -108,6 +127,47 @@
       google.charts.setOnLoadCallback(drawChart(auData));
     }
 
+    /**
+     * データを取得し、グラフを表示する。
+     * @param  {String}   name          設定名
+     * @param  {String}   yearMonthDate yyyy-MM-dd形式の年月日
+     * @param  {Function} callback      コールバック関数
+     */
+    function showChart(name, yearMonthDate, callback) {
+      function onSuccess(dataJson){
+        const json = JSON.parse(dataJson);
+        dispChart(json);
+
+        var state = { 'timestamp': Date.now() };
+        var params = { name: name, ymd: yearMonthDate };
+        google.script.history.replace(state, params);
+        if(typeof callback === 'function') callback();
+      }
+      function onFailure(error){console.error(error)}
+
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getDataJson(name, yearMonthDate)
+    }
+
+    /**
+     * グラフエリアを初期化する。
+     * @param  {String} message メッセージ。
+     */
+    function clearChart(message){
+      document.querySelector('#chart').innerHTML = message || '';
+      document.querySelector('#ss-url').href = '';
+      var reloadButton = document.querySelector("#reload>button");
+      reloadButton.dataset.name = "";
+      reloadButton.dataset.ymd = "";
+    }
+
+    /**
+     * 指定したSelect要素にOptionを設定する
+     * @param  {String} selector クエリセレクタ
+     * @param  {Array} list     {name, value} の配列
+     */
     function insertOptions(selector, list){
       var target = document.querySelector(selector)
       var options = '';
@@ -123,12 +183,20 @@
       target.dispatchEvent(new Event('change'));
     }
 
+    /**
+     * 指定した要素を初期化する。
+     * @param  {String} selector クエリセレクタ
+     */
     function initSelect(selector){
       var elm = document.querySelector(selector);
       elm.classList.remove("active");
       elm.innerHTML = '';
     }
 
+    /**
+     * 指定した要素を処理中にする。
+     * @param  {String} selector クエリセレクタ
+     */
     function processingSelect(selector){
       var elm = document.querySelector(selector);
       elm.classList.remove("active");
@@ -136,75 +204,74 @@
       elm.innerHTML = '';
     }
 
-    document.querySelector('select#name').addEventListener('change',function(e){
+    document.querySelector('select#name').addEventListener('change',function(event){
       processingSelect('select#year');
       initSelect('select#yearMonth');
       initSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(years){
         insertOptions('select#year', years)
       }
       function onFailure(error){console.error(error)}
 
-      var name = e.target.value;
+      var name = event.target.value;
       google.script.run
         .withSuccessHandler(onSuccess)
         .withFailureHandler(onFailure)
         .getYears(name)
     });
 
-    document.querySelector('select#year').addEventListener('change',function(e){
+    document.querySelector('select#year').addEventListener('change',function(event){
       processingSelect('select#yearMonth');
       initSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(yearMonths){
         insertOptions('select#yearMonth', yearMonths)
       }
       function onFailure(error){console.error(error)}
 
       var name = document.querySelector("select#name").value;
-      var year = e.target.value;
+      var year = event.target.value;
       google.script.run
         .withSuccessHandler(onSuccess)
         .withFailureHandler(onFailure)
         .getYearMonths(name, year)
     });
 
-    document.querySelector('select#yearMonth').addEventListener('change',function(e){
+    document.querySelector('select#yearMonth').addEventListener('change',function(event){
       processingSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(yearMonthDates){
         insertOptions('select#yearMonthDate', yearMonthDates)
       }
       function onFailure(error){console.error(error)}
 
       var name = document.querySelector("select#name").value;
-      var yearMonth = e.target.value;
+      var yearMonth = event.target.value;
       google.script.run
         .withSuccessHandler(onSuccess)
         .withFailureHandler(onFailure)
         .getYearMonthDates(name, yearMonth)
     });
 
-    document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
-      const loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>'
-      document.querySelector('#chart').innerHTML = loadingMsg;
-      document.querySelector('#ss-url').href = '';
+    document.querySelector('select#yearMonthDate').addEventListener('change',function(event){
+      var loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>';
+      clearChart(loadingMsg);
 
       var name = document.querySelector("select#name").value;
-      var yearMonthDate = e.target.value;
+      var yearMonthDate = event.target.value;
+      showChart(name, yearMonthDate);
+    });
 
-      function onSuccess(dataJson){
-        const json = JSON.parse(dataJson);
-        dispChart(json);
-
-        var state = { 'timestamp': Date.now() };
-        var params = { name: name, ymd: yearMonthDate };
-        google.script.history.replace(state, params);
-      }
-      function onFailure(error){console.error(error)}
-
-      google.script.run
-        .withSuccessHandler(onSuccess)
-        .withFailureHandler(onFailure)
-        .getDataJson(name, yearMonthDate)
+    document.querySelector('#reload>button').addEventListener('click',function(event){
+      event.target.disabled = true;
+      var name = event.target.dataset.name;
+      var yearMonthDate = event.target.dataset.ymd;
+      function callback() { event.target.disabled = false; }
+      showChart(name, yearMonthDate, callback);
     });
 
     document.addEventListener('DOMContentLoaded', function(){

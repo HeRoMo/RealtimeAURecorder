@@ -1,4 +1,6 @@
 const SETTINGS_SHEET_NAME = 'SETTINGS';
+const PROP_KEY_SSID = 'settingsSsId';
+const TIMEZONE = 9;
 
 /**
  * Range#getValues で取得した2次元配列をオブジェクトの配列に変換する。
@@ -17,9 +19,13 @@ function values2object(values) {
   });
 }
 
+/**
+ * ScriptPropertyに保存されたコンテナドキュメントのIDを取得する。
+ * @return {String} コンテナドキュメントのID
+ */
 function getSettingsSsId() {
   const scriptProperties = PropertiesService.getScriptProperties();
-  return scriptProperties.getProperty('settingsSsId');
+  return scriptProperties.getProperty(PROP_KEY_SSID);
 }
 
 class Settings {
@@ -30,7 +36,7 @@ class Settings {
    */
   static setUp() {
     const scriptProperties = PropertiesService.getScriptProperties();
-    scriptProperties.setProperty('settingsSsId', SpreadsheetApp.getActiveSpreadsheet().getId());
+    scriptProperties.setProperty(PROP_KEY_SSID, SpreadsheetApp.getActiveSpreadsheet().getId());
   }
 
   /**
@@ -49,14 +55,25 @@ class Settings {
     this.settingData = values2object(values);
   }
 
+  /**
+   * 全設定データを取得する
+   * @return {Array} {name,ga_view_id,base_dir}の配列
+   */
   getAll() {
     return this.settingData;
   }
 
+  /**
+   * 指定した名前に対応するデータを取得する
+   * @param  {String} name アプリケーション名
+   * @return {Object}      {name,ga_view_id,base_dir}
+   */
   get(name) {
     const setting = this.settingData.filter(elm => elm.name === name)[0];
     return setting;
   }
 }
+
+Settings.TIMEZONE = TIMEZONE;
 
 export default Settings;

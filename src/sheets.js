@@ -53,6 +53,11 @@ class Sheets {
     return yearMonths;
   }
 
+  /**
+   * 指定した年月の日のリストを取得する
+   * @param  {String} yearMonth yyyy-MM 形式の年月
+   * @return {[type]}           { name, value } の配列
+   */
   getDatesOf(yearMonth) {
     const yearMonthFile = this.getSpreadSheetFile(yearMonth);
     const sheets = yearMonthFile.getSheets();
@@ -62,9 +67,7 @@ class Sheets {
       const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
       return ret;
     });
-    dates = dates.filter((value) => {
-      if (value) return value;
-    });
+    dates = dates.filter(value => !!value);
     return dates;
   }
 
@@ -137,6 +140,22 @@ class Sheets {
     const yearMonthDate = Utilities.formatDate(date, TIME_ZONE, DATE_FORMAT);
     const sheet = this.getSheet(yearMonthDate);
     sheet.appendRow([data.datetime, data.activeUsers, data.status]);
+  }
+
+  /**
+   * 指定した年月日のデータを取得する。
+   * ヘッダは削除されている。
+   * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
+   * @return {Array[][]}            データ [日次, アクティブユーザ数]
+   */
+  getData(yearMonthDate) {
+    const sheet = this.getSheet(yearMonthDate);
+    const range = sheet.getDataRange();
+    const data = range.getValues();
+    data.shift();
+    const refinedData = data.map(row => row.slice(0, 2));
+    const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`;
+    return { data: refinedData, url };
   }
 }
 
