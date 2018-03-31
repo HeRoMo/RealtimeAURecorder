@@ -71,6 +71,10 @@
   <a id="ss-url" href="" target="_blank">View Spreadsheet</a>
   <script type="text/javascript">
   (function(){
+    /**
+     * グラフを描画する
+     * @param  {[type]} auData {name, ymd, data, url}
+     */
     function drawChart(auData) {
       return function(){
         var data = new google.visualization.DataTable();
@@ -84,14 +88,11 @@
           hAxis: {
             format: 'HH:mm',
             gridlines: { count: 12 },
-            minorGridlines: {
-              count: 7,
-            }
+            minorGridlines: { count: 7 }
           },
           timeZone: 9,
           theme: 'maximized',
         };
-
 
         var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
         format.format(data, 0);
@@ -101,6 +102,10 @@
       }
     }
 
+    /**
+     * グラフを表示する
+     * @param  {Object} data {name, ymd, data, url}
+     */
     function dispChart(data){
       var auData = Object.assign({}, data,
         {data: data.data.map(row => { return [new Date(row[0]), row[1]]})});
@@ -108,6 +113,11 @@
       google.charts.setOnLoadCallback(drawChart(auData));
     }
 
+    /**
+     * 指定したSelect要素にOptionを設定する
+     * @param  {String} selector クエリセレクタ
+     * @param  {Array} list     {name, value} の配列
+     */
     function insertOptions(selector, list){
       var target = document.querySelector(selector)
       var options = '';
@@ -123,12 +133,20 @@
       target.dispatchEvent(new Event('change'));
     }
 
+    /**
+     * 指定した要素を初期化する。
+     * @param  {String} selector クエリセレクタ
+     */
     function initSelect(selector){
       var elm = document.querySelector(selector);
       elm.classList.remove("active");
       elm.innerHTML = '';
     }
 
+    /**
+     * 指定した要素を処理中にする。
+     * @param  {String} selector クエリセレクタ
+     */
     function processingSelect(selector){
       var elm = document.querySelector(selector);
       elm.classList.remove("active");
@@ -136,10 +154,21 @@
       elm.innerHTML = '';
     }
 
+    /**
+     * グラフエリアを初期化する。
+     * @param  {String} message メッセージ。
+     */
+    function clearChart(message){
+      document.querySelector('#chart').innerHTML = message || '';
+      document.querySelector('#ss-url').href = '';
+    }
+
     document.querySelector('select#name').addEventListener('change',function(e){
       processingSelect('select#year');
       initSelect('select#yearMonth');
       initSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(years){
         insertOptions('select#year', years)
       }
@@ -155,6 +184,8 @@
     document.querySelector('select#year').addEventListener('change',function(e){
       processingSelect('select#yearMonth');
       initSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(yearMonths){
         insertOptions('select#yearMonth', yearMonths)
       }
@@ -170,6 +201,8 @@
 
     document.querySelector('select#yearMonth').addEventListener('change',function(e){
       processingSelect('select#yearMonthDate');
+      clearChart();
+
       function onSuccess(yearMonthDates){
         insertOptions('select#yearMonthDate', yearMonthDates)
       }
@@ -184,9 +217,8 @@
     });
 
     document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
-      const loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>'
-      document.querySelector('#chart').innerHTML = loadingMsg;
-      document.querySelector('#ss-url').href = '';
+      var loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>';
+      clearChart(loadingMsg);
 
       var name = document.querySelector("select#name").value;
       var yearMonthDate = e.target.value;

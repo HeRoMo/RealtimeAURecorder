@@ -21,6 +21,9 @@ function exec() {
   settings.forEach(setting => recordAU(setting));
 }
 
+/**
+ * ScriptPropertyにコンテナドキュメントのIDを保存する。
+ */
 function setUp() {
   Settings.setUp();
 }

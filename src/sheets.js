@@ -53,6 +53,11 @@ class Sheets {
     return yearMonths;
   }
 
+  /**
+   * 指定した年月の日のリストを取得する
+   * @param  {String} yearMonth yyyy-MM 形式の年月
+   * @return {[type]}           { name, value } の配列
+   */
   getDatesOf(yearMonth) {
     const yearMonthFile = this.getSpreadSheetFile(yearMonth);
     const sheets = yearMonthFile.getSheets();
