@@ -56,11 +56,14 @@ class Sheets {
   getDatesOf(yearMonth) {
     const yearMonthFile = this.getSpreadSheetFile(yearMonth);
     const sheets = yearMonthFile.getSheets();
-    Logger.log(sheets);
-    const dates = sheets.map((sheet) => {
+    let dates = sheets.map((sheet) => {
       const value = sheet.getName();
       const name = value.split('-')[2];
-      return { name, value };
+      const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
+      return ret;
+    });
+    dates = dates.filter((value) => {
+      if (value) return value;
     });
     return dates;
   }
