@@ -33,6 +33,10 @@
     select.processing + .loading {
       display: inline-block;
     }
+    #chart {
+      width:1200px;
+      height: 800px;
+    }
   </style>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
@@ -61,7 +65,7 @@
       </div>
     </div>
   </fieldset>
-  <div id="curve_chart" style="width: 900px; height: 600px"></div>
+  <div id="chart"></div>
   <script type="text/javascript">
 
     function drawChart() {
@@ -84,7 +88,7 @@
 
       var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
       format.format(data, 0);
-      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+      var chart = new google.visualization.LineChart(document.getElementById('chart'));
       chart.draw(data, options);
     }
 
