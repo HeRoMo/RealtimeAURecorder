@@ -67,9 +67,7 @@ class Sheets {
       const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
       return ret;
     });
-    dates = dates.filter((value) => {
-      if (value) return value;
-    });
+    dates = dates.filter(value => !!value);
     return dates;
   }
 
