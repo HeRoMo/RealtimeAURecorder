@@ -23,6 +23,52 @@ class Sheets {
   }
 
   /**
+   * 西暦の一覧を取得する
+   * @return {Object} {name, value}
+   */
+  getYears() {
+    const folders = this.baseDir.getFolders();
+    const years = [];
+    while (folders.hasNext()) {
+      const name = folders.next().getName();
+      years.push({ name, value: name });
+    }
+    return years;
+  }
+
+  /**
+   * 指定された年の月の一覧を取得する
+   * @param  {Integer} year 西暦
+   * @return {Object}  {name, value}
+   */
+  getMonthsOf(year) {
+    const yearDir = this.getYearDir(year);
+    const folders = yearDir.getFilesByType(MimeType.GOOGLE_SHEETS);
+    const yearMonths = [];
+    while (folders.hasNext()) {
+      const value = folders.next().getName();
+      const month = value.split('-')[1];
+      yearMonths.push({ name: month, value });
+    }
+    return yearMonths;
+  }
+
+  getDatesOf(yearMonth) {
+    const yearMonthFile = this.getSpreadSheetFile(yearMonth);
+    const sheets = yearMonthFile.getSheets();
+    let dates = sheets.map((sheet) => {
+      const value = sheet.getName();
+      const name = value.split('-')[2];
+      const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
+      return ret;
+    });
+    dates = dates.filter((value) => {
+      if (value) return value;
+    });
+    return dates;
+  }
+
+  /**
    * year に対応した名称のフォルダを取得する。なければ作る。
    * @param  {Date}   [year=new Date().getYear()] [description]
    * @return {Folder} 取得、あるいは生成したフォルダ

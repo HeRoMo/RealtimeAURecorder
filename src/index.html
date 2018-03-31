@@ -1,0 +1,219 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style type="text/css">
+    body { padding: 10px 50px; }
+    fieldset { width: 600px; }
+    legend { font-size: 1.2rem; }
+    select { display: none; }
+    select.active { display: inline-block; }
+
+    .field { display: inline-block; }
+    div.loading {
+      display: none;
+      position: relative;
+      height: 20px;
+      width: 70px;
+    }
+    div.loading > div {
+      width: 12px;
+      height: 12px;
+      border: 3px solid rgba(71,135,237,0.4);
+      border-top-color: rgba(71,135,237,0.9);
+      border-radius: 50%;
+      animation: spin 1.2s linear 0s infinite;
+      position: absolute;
+      top: 7px;
+      left: 25px;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
+    }
+    .processing + .loading {
+      display: inline-block;
+    }
+    #chart {
+      width: 800px;
+      height: 600px;
+      margin: 20px;
+    }
+    a[href=""] { display: none; }
+  </style>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+  <h1>グラフ</h1>
+  <fieldset>
+    <legend>対象サービスと年月日を選択</legend>
+    <div class="block form-group">
+      <select id="name" class="active">
+        <option>選択して下さい</option>
+        <? for(var i = 0; i < settings.length; i++) { ?>
+          <option value="<?=settings[i].name?>"><?=settings[i].name?></option>
+        <? } ?>
+      </select>
+      <div class="field year">
+        <select id="year"></select>
+        <div class="loading"><div></div></div>
+      </div>
+      <div class="field yearMonth">
+        <select id="yearMonth"></select>
+        <div class="loading"><div></div></div>
+      </div>
+      <div class="field yearMonthDate">
+        <select id="yearMonthDate"></select>
+        <div class="loading"><div></div></div>
+      </div>
+    </div>
+  </fieldset>
+  <div id="chart"></div>
+  <a id="ss-url" href="" target="_blank">View Spreadsheet</a>
+  <script type="text/javascript">
+  (function(){
+    function drawChart(auData) {
+      return function(){
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', '日時');
+        data.addColumn('number', 'Realtime Active Users');
+        data.addRows(auData.data);
+
+        var options = {
+          title: auData.name + ' [ ' + auData.ymd + ' ] の' + 'リアルタイムアクティブユーザ',
+          legend: { position: 'in' },
+          hAxis: {
+            format: 'HH:mm',
+            gridlines: { count: 12 },
+            minorGridlines: {
+              count: 7,
+            }
+          },
+          timeZone: 9,
+          theme: 'maximized',
+        };
+
+
+        var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
+        format.format(data, 0);
+        var chart = new google.visualization.LineChart(document.querySelector('#chart'));
+        chart.draw(data, options);
+        document.querySelector('#ss-url').href=auData.url
+      }
+    }
+
+    function dispChart(data){
+      var auData = Object.assign({}, data,
+        {data: data.data.map(row => { return [new Date(row[0]), row[1]]})});
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart(auData));
+    }
+
+    function insertOptions(selector, list){
+      var target = document.querySelector(selector)
+      var options = '';
+      for (var i = 0; i < list.length; i++){
+        var option = (i == 0) ?
+          '<option value="'+list[i].value+'" selected>'+list[i].name+'</option>' :
+          '<option value="'+list[i].value+'">'+list[i].name+'</option>';
+        options = options + option;
+      }
+      target.innerHTML = options;
+      target.classList.add("active");
+      target.classList.remove("processing");
+      target.dispatchEvent(new Event('change'));
+    }
+
+    function initSelect(selector){
+      var elm = document.querySelector(selector);
+      elm.classList.remove("active");
+      elm.innerHTML = '';
+    }
+
+    function processingSelect(selector){
+      var elm = document.querySelector(selector);
+      elm.classList.remove("active");
+      elm.classList.add("processing");
+      elm.innerHTML = '';
+    }
+
+    document.querySelector('select#name').addEventListener('change',function(e){
+      processingSelect('select#year');
+      initSelect('select#yearMonth');
+      initSelect('select#yearMonthDate');
+      function onSuccess(years){
+        insertOptions('select#year', years)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYears(name)
+    });
+
+    document.querySelector('select#year').addEventListener('change',function(e){
+      processingSelect('select#yearMonth');
+      initSelect('select#yearMonthDate');
+      function onSuccess(yearMonths){
+        insertOptions('select#yearMonth', yearMonths)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = document.querySelector("select#name").value;
+      var year = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYearMonths(name, year)
+    });
+
+    document.querySelector('select#yearMonth').addEventListener('change',function(e){
+      processingSelect('select#yearMonthDate');
+      function onSuccess(yearMonthDates){
+        insertOptions('select#yearMonthDate', yearMonthDates)
+      }
+      function onFailure(error){console.error(error)}
+
+      var name = document.querySelector("select#name").value;
+      var yearMonth = e.target.value;
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getYearMonthDates(name, yearMonth)
+    });
+
+    document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
+      const loadingMsg = '<span class="processing">グラフを準備しています</span><div class="loading"><div></div></div>'
+      document.querySelector('#chart').innerHTML = loadingMsg;
+      document.querySelector('#ss-url').href = '';
+
+      var name = document.querySelector("select#name").value;
+      var yearMonthDate = e.target.value;
+
+      function onSuccess(dataJson){
+        const json = JSON.parse(dataJson);
+        dispChart(json);
+
+        var state = { 'timestamp': Date.now() };
+        var params = { name: name, ymd: yearMonthDate };
+        google.script.history.replace(state, params);
+      }
+      function onFailure(error){console.error(error)}
+
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .getDataJson(name, yearMonthDate)
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+      var auData = JSON.parse(<?= data ?>);
+      if(auData.data.length > 0){
+        dispChart(auData);
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

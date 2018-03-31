@@ -17,17 +17,46 @@ function values2object(values) {
   });
 }
 
-/**
- * 設定を取得する。
- * @return {Array[Object]} 設定のリスト
- */
-function getSettings() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const settingSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
-  const values = settingSheet.getDataRange().getValues();
-  const data = values2object(values);
-  Logger.log(data);
-  return data;
+function getSettingsSsId() {
+  const scriptProperties = PropertiesService.getScriptProperties();
+  return scriptProperties.getProperty('settingsSsId');
 }
 
-export default getSettings;
+class Settings {
+  /**
+   * セットアップメソッド
+   * 設定ファイルからスクリプトエディタを開き、一度実行すると、スクリプトプロパティに
+   * 設定ファイルのIDを保存する。
+   */
+  static setUp() {
+    const scriptProperties = PropertiesService.getScriptProperties();
+    scriptProperties.setProperty('settingsSsId', SpreadsheetApp.getActiveSpreadsheet().getId());
+  }
+
+  /**
+   * 設定を取得する。
+   * @return {Array[Object]} 設定のリスト
+   */
+  constructor(ssId = getSettingsSsId()) {
+    let ss;
+    if (ssId) {
+      ss = SpreadsheetApp.openById(ssId);
+    } else {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+    const settingSheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
+    const values = settingSheet.getDataRange().getValues();
+    this.settingData = values2object(values);
+  }
+
+  getAll() {
+    return this.settingData;
+  }
+
+  get(name) {
+    const setting = this.settingData.filter(elm => elm.name === name)[0];
+    return setting;
+  }
+}
+
+export default Settings;
