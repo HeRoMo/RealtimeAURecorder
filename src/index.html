@@ -1,26 +1,66 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style type="text/css">
+    body { padding: 10px 50px; }
+    fieldset { width: 600px; }
+    legend { font-size: 1.2rem; }
+    select { display: none; }
+    select.active { display: inline-block; }
+
+    .field { display: inline-block; }
+    div.loading {
+      display: none;
+      position: relative;
+      height: 20px;
+      width: 70px;
+    }
+    div.loading > div {
+      width: 12px;
+      height: 12px;
+      border: 3px solid rgba(71,135,237,0.4);
+      border-top-color: rgba(71,135,237,0.9);
+      border-radius: 50%;
+      animation: spin 1.2s linear 0s infinite;
+      position: absolute;
+      top: 7px;
+      left: 25px;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
+    }
+    select.processing + .loading {
+      display: inline-block;
+    }
+  </style>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
   <h1>グラフ<h1>
-  <div>
-    <select id="name">
-      <option>選択して下さい</option>
-      <? for(var i = 0; i < settings.length; i++) { ?>
-        <option value="<?=settings[i].name?>"><?=settings[i].name?></option>
-      <? } ?>
-    </select>
-
-    <select id="year">
-      <? for(var i = 0; i < years.length; i++) { ?>
-        <option value="<?=years[i]?>"><?=years[i]?></option>
-      <? } ?>
-    </select>
-    <select id="yearMonth"></select>
-    <select id="yearMonthDate"></select>
-  </div>
+  <fieldset>
+    <legend>対象サービスと年月日を選択</legend>
+    <div class="block form-group">
+      <select id="name" class="active">
+        <option>選択して下さい</option>
+        <? for(var i = 0; i < settings.length; i++) { ?>
+          <option value="<?=settings[i].name?>"><?=settings[i].name?></option>
+        <? } ?>
+      </select>
+      <div class="field year">
+        <select id="year"></select>
+        <div class="loading"><div></div></div>
+      </div>
+      <div class="field yearMonth">
+        <select id="yearMonth"></select>
+        <div class="loading"><div></div></div>
+      </div>
+      <div class="field yearMonthDate">
+        <select id="yearMonthDate"></select>
+        <div class="loading"><div></div></div>
+      </div>
+    </div>
+  </fieldset>
   <div id="curve_chart" style="width: 900px; height: 600px"></div>
   <script type="text/javascript">
 
@@ -60,19 +100,37 @@
     }
 
     function insertOptions(selector, list){
-      var yearSelect = document.querySelector(selector)
-      var yearOptions = '';
+      var target = document.querySelector(selector)
+      var options = '';
       for (var i = 0; i < list.length; i++){
         var option = (i == 0) ?
           '<option value="'+list[i].value+'" selected>'+list[i].name+'</option>' :
           '<option value="'+list[i].value+'">'+list[i].name+'</option>';
-        yearOptions = yearOptions + option;
+        options = options + option;
       }
-      yearSelect.innerHTML = yearOptions;
-      yearSelect.dispatchEvent(new Event('change'));
+      target.innerHTML = options;
+      target.classList.add("active");
+      target.classList.remove("processing");
+      target.dispatchEvent(new Event('change'));
     }
 
-    document.querySelector("select#name").addEventListener('change',function(e){
+    function initSelect(selector){
+      var elm = document.querySelector(selector);
+      elm.classList.remove("active");
+      elm.innerHTML = '';
+    }
+
+    function processingSelect(selector){
+      var elm = document.querySelector(selector);
+      elm.classList.remove("active");
+      elm.classList.add("processing");
+      elm.innerHTML = '';
+    }
+
+    document.querySelector('select#name').addEventListener('change',function(e){
+      processingSelect('select#year');
+      initSelect('select#yearMonth');
+      initSelect('select#yearMonthDate');
       function onSuccess(years){
         insertOptions('select#year', years)
       }
@@ -86,6 +144,8 @@
     });
 
     document.querySelector('select#year').addEventListener('change',function(e){
+      processingSelect('select#yearMonth');
+      initSelect('select#yearMonthDate');
       function onSuccess(yearMonths){
         insertOptions('select#yearMonth', yearMonths)
       }
@@ -100,6 +160,7 @@
     });
 
     document.querySelector('select#yearMonth').addEventListener('change',function(e){
+      processingSelect('select#yearMonthDate');
       function onSuccess(yearMonthDates){
         insertOptions('select#yearMonthDate', yearMonthDates)
       }
