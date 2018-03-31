@@ -38,6 +38,7 @@
       height: 600px;
       margin: 20px;
     }
+    a[href=""] { display: none; }
   </style>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
@@ -67,6 +68,7 @@
     </div>
   </fieldset>
   <div id="chart"></div>
+  <a id="ss-url" href="" target="_blank">View Spreadsheet</a>
   <script type="text/javascript">
   (function(){
     function drawChart(auData) {
@@ -95,6 +97,7 @@
         format.format(data, 0);
         var chart = new google.visualization.LineChart(document.querySelector('#chart'));
         chart.draw(data, options);
+        document.querySelector('#ss-url').href=auData.url
       }
     }
 
@@ -182,6 +185,7 @@
 
     document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
       document.querySelector('#chart').innerHTML = '';
+      document.querySelector('#ss-url').href = '';
 
       var name = document.querySelector("select#name").value;
       var yearMonthDate = e.target.value;

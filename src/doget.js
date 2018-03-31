@@ -11,18 +11,23 @@ function getData(name, yearMonthDate) {
   const data = range.getValues();
   data.shift();
   const result = data.map(row => row.slice(0, 2));
-  return result;
+  const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`
+  return { data: result, url };
 }
 
 function getDataJson(name, yearMonthDate) {
-  const data = getData(name, yearMonthDate);
-  return JSON.stringify({ name, ymd: yearMonthDate, data });
+  const { data, url } = getData(name, yearMonthDate);
+  return JSON.stringify({
+    name,
+    ymd: yearMonthDate,
+    data,
+    url,
+  });
 }
 
 function doGet(e) {
   const params = e.parameter;
-  const name = params.name;
-  const ymd = params.ymd;
+  const { name, ymd } = params;
 
   let data = { name, ymd, data: [] };
   if (name && ymd) {
