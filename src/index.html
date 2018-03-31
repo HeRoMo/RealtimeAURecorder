@@ -34,14 +34,15 @@
       display: inline-block;
     }
     #chart {
-      width:1200px;
-      height: 800px;
+      width: 800px;
+      height: 600px;
+      margin: 20px;
     }
   </style>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
-  <h1>グラフ<h1>
+  <h1>グラフ</h1>
   <fieldset>
     <legend>対象サービスと年月日を選択</legend>
     <div class="block form-group">
@@ -67,40 +68,37 @@
   </fieldset>
   <div id="chart"></div>
   <script type="text/javascript">
+  (function(){
+    function drawChart(auData) {
+      return function(){
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', '日時');
+        data.addColumn('number', 'Realtime Active Users');
+        data.addRows(auData.data);
 
-    function drawChart() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('datetime', '日時');
-      data.addColumn('number', 'Realtime Active Users');
-      data.addRows(auData);
+        var options = {
+          title: auData.name + ' [ ' + auData.ymd + ' ] の' + 'リアルタイムアクティブユーザ',
+          legend: { position: 'in' },
+          hAxis: {
+            format: 'HH:mm',
+            gridlines: {count: 15},
+          },
+          timeZone: 9,
+          theme: 'maximized',
+        };
 
-      var options = {
-        title: 'アクティブユーザ',
-        legend: { position: 'bottom' },
-        width: '900',
-        height: '600',
-        hAxis: {
-          format: 'HH:mm',
-          gridlines: {count: 15}
-        },
-        timeZone: 9
-      };
-
-      var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
-      format.format(data, 0);
-      var chart = new google.visualization.LineChart(document.getElementById('chart'));
-      chart.draw(data, options);
+        var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
+        format.format(data, 0);
+        var chart = new google.visualization.LineChart(document.querySelector('#chart'));
+        chart.draw(data, options);
+      }
     }
 
     function dispChart(data){
-      auData = data.map(row => { return [new Date(row[0]), row[1]]})
+      var auData = Object.assign({}, data,
+        {data: data.data.map(row => { return [new Date(row[0]), row[1]]})});
       google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-    }
-
-    var auData = JSON.parse(<?= data ?>);
-    if(auData.length > 0){
-      dispChart(auData);
+      google.charts.setOnLoadCallback(drawChart(auData));
     }
 
     function insertOptions(selector, list){
@@ -179,20 +177,34 @@
     });
 
     document.querySelector('select#yearMonthDate').addEventListener('change',function(e){
-      function onSuccess(dataJson){
-        const data = JSON.parse(dataJson);
-        dispChart(data);
-      }
-      function onFailure(error){console.error(error)}
+      document.querySelector('#chart').innerHTML = '';
 
       var name = document.querySelector("select#name").value;
       var yearMonthDate = e.target.value;
+
+      function onSuccess(dataJson){
+        const json = JSON.parse(dataJson);
+        dispChart(json);
+
+        var state = { 'timestamp': Date.now() };
+        var params = { name: name, ymd: yearMonthDate };
+        google.script.history.replace(state, params);
+      }
+      function onFailure(error){console.error(error)}
 
       google.script.run
         .withSuccessHandler(onSuccess)
         .withFailureHandler(onFailure)
         .getDataJson(name, yearMonthDate)
     });
+
+    document.addEventListener('DOMContentLoaded', function(){
+      var auData = JSON.parse(<?= data ?>);
+      if(auData.data.length > 0){
+        dispChart(auData);
+      }
+    });
+  })();
   </script>
 </body>
 </html>

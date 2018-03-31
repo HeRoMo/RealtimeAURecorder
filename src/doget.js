@@ -16,7 +16,7 @@ function getData(name, yearMonthDate) {
 
 function getDataJson(name, yearMonthDate) {
   const data = getData(name, yearMonthDate);
-  return JSON.stringify(data);
+  return JSON.stringify({ name, ymd: yearMonthDate, data });
 }
 
 function doGet(e) {
@@ -24,9 +24,9 @@ function doGet(e) {
   const name = params.name;
   const ymd = params.ymd;
 
-  let data = [];
+  let data = { name, ymd, data: [] };
   if (name && ymd) {
-    data = getData(name, ymd);
+    data = getDataJson(name, ymd);
   }
 
   let years = [];
@@ -36,7 +36,7 @@ function doGet(e) {
   }
 
   const template = HtmlService.createTemplateFromFile('index');
-  template.data = JSON.stringify(data);
+  template.data = data;
   template.settings = settings.getAll();
   template.years = years;
   return template.evaluate();
