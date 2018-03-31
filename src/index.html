@@ -81,11 +81,15 @@
           legend: { position: 'in' },
           hAxis: {
             format: 'HH:mm',
-            gridlines: {count: 15},
+            gridlines: { count: 12 },
+            minorGridlines: {
+              count: 7,
+            }
           },
           timeZone: 9,
           theme: 'maximized',
         };
+
 
         var format = new google.visualization.DateFormat({pattern: "yyyy-MM-dd HH:mm"});
         format.format(data, 0);
