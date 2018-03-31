@@ -4,31 +4,15 @@ import Sheets from './sheets';
 const settings = new Settings();
 
 /**
- * スプレッドシートからデータを取得する
- * @param  {String} name          [description]
- * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
- * @return {Object}               {data, url}
- */
-function getData(name, yearMonthDate) {
-  const setting = settings.get(name);
-  const s = new Sheets(setting.base_dir);
-  const sheet = s.getSheet(yearMonthDate);
-  const range = sheet.getDataRange();
-  const data = range.getValues();
-  data.shift();
-  const result = data.map(row => row.slice(0, 2));
-  const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`;
-  return { data: result, url };
-}
-
-/**
  * JSON.stringifyしたスプレッドシートからデータを取得する
  * @param  {String} name          [description]
  * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
  * @return {Object}               {name,ymd,data,url}
  */
 function getDataJson(name, yearMonthDate) {
-  const { data, url } = getData(name, yearMonthDate);
+  const setting = settings.get(name);
+  const s = new Sheets(setting.base_dir);
+  const { data, url } = s.getData(yearMonthDate);
   return JSON.stringify({
     name,
     ymd: yearMonthDate,

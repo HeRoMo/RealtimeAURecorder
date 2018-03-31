@@ -141,6 +141,22 @@ class Sheets {
     const sheet = this.getSheet(yearMonthDate);
     sheet.appendRow([data.datetime, data.activeUsers, data.status]);
   }
+
+  /**
+   * 指定した年月日のデータを取得する。
+   * ヘッダは削除されている。
+   * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
+   * @return {Array[][]}            データ [日次, アクティブユーザ数]
+   */
+  getData(yearMonthDate) {
+    const sheet = this.getSheet(yearMonthDate);
+    const range = sheet.getDataRange();
+    const data = range.getValues();
+    data.shift();
+    const refinedData = data.map(row => row.slice(0, 2));
+    const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`;
+    return { data: refinedData, url };
+  }
 }
 
 export default Sheets;
