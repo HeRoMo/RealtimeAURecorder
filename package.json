@@ -11,8 +11,13 @@
     "cleanup": "rm -rf dest/*",
     "deploy": "./node_modules/.bin/clasp push"
   },
-  "keywords": ["gas", "analytics", "google sheets"],
+  "keywords": [
+    "gas",
+    "analytics",
+    "google sheets"
+  ],
   "author": "HeRoMo",
+  "repository": "https://github.com/HeRoMo/RealtimeAURecorder",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
