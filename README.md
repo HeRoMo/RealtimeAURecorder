@@ -32,7 +32,7 @@ This application has the following features,
   ```
   **Notice:** this scripts uses `clasp` command. see [google/clasp](https://github.com/google/clasp)
 6. Open container spreadsheet, and open script editor, then run `setUp` function in *code.gs*.
-7. Trun **ON** *Google Analytics API* in Advanced Google services setting of the script and API console of Google Cloud.
+7. Turn **ON** *Google Analytics API* in Advanced Google services setting of the script and API console of Google Cloud.
 
 
 ## How to setting
@@ -46,6 +46,8 @@ This application has the following features,
   Open script editor and exec `recordAUAll` function in *code.gs*.<br>
   if your setting is collect, a folder and a spreadsheet created in *base_dir*.
 5. If you have another web site, add another row in the SETTINGS sheet.
+
+![SETTINGS](doc/SETTINGS.png)
 
 ## Record continuously
 To record active users, you only run `recordAUAll` function in *code.gs*.<br>
