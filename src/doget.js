@@ -29,23 +29,21 @@ function doGet(e) {
   const params = e.parameter;
   const { name, ymd } = params;
 
+  let title = 'RealtimeAURecorder';
+
   let data = { name, ymd, data: [] };
   if (name && ymd) {
     data = getDataJson(name, ymd);
-  }
-
-  let years = [];
-  if (name) {
-    const dataSheets = new Sheets(settings.get(name).base_dir);
-    years = dataSheets.getYears();
+    title = `${name} [${ymd}] - ${title}`;
   }
 
   const template = HtmlService.createTemplateFromFile('index');
   template.data = data;
   template.settings = settings.getAll();
   template.timezone = Settings.TIMEZONE;
-  template.years = years;
-  return template.evaluate();
+  const htmloutput = template.evaluate();
+  htmloutput.setTitle(title);
+  return htmloutput;
 }
 
 /**
