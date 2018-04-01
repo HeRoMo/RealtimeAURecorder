@@ -14,9 +14,10 @@ function recordAU(setting) {
 }
 
 /**
- * 定期的に実行する関数
+ * すべての設定のデータを処理し、アクティブユーザを記録する。
+ * 定期的に実行することを想定。
  */
-function exec() {
+function recordAUAll() {
   const settings = new Settings().getAll();
   settings.forEach(setting => recordAU(setting));
 }
@@ -28,5 +29,5 @@ function setUp() {
   Settings.setUp();
 }
 
-global.exec = exec;
+global.recordAUAll = recordAUAll;
 global.setUp = setUp;
