@@ -1,7 +1,7 @@
 {
-  "name": "RealtimeAuRecorder",
+  "name": "RealtimeAURecorder",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Google Apps Script application to record realtime active users from Google Analytics.",
   "main": "index.js",
   "scripts": {
     "login": "./node_modules/.bin/clasp login",
@@ -11,9 +11,9 @@
     "cleanup": "rm -rf dest/*",
     "deploy": "./node_modules/.bin/clasp push"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["gas", "analytics", "google sheets"],
+  "author": "HeRoMo",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "@google/clasp": "^1.1.5",
