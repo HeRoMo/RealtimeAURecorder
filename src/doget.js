@@ -34,17 +34,10 @@ function doGet(e) {
     data = getDataJson(name, ymd);
   }
 
-  let years = [];
-  if (name) {
-    const dataSheets = new Sheets(settings.get(name).base_dir);
-    years = dataSheets.getYears();
-  }
-
   const template = HtmlService.createTemplateFromFile('index');
   template.data = data;
   template.settings = settings.getAll();
   template.timezone = Settings.TIMEZONE;
-  template.years = years;
   return template.evaluate();
 }
 
