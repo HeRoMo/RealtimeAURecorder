@@ -1,15 +1,15 @@
-import Settings from './settings';
+import Settings, { Setting } from './app_settings';
 import Sheets from './sheets';
 
 const settings = new Settings();
 
 /**
  * JSON.stringifyしたスプレッドシートからデータを取得する
- * @param  {String} name          [description]
- * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
- * @return {Object}               {name,ymd,data,url}
+ * @param name          [description]
+ * @param yearMonthDate yyyy-MM-dd形式の年月日
+ * @return JSON.stringifyしたスプレッドシートデータ
  */
-function getDataJson(name, yearMonthDate) {
+function getDataJson(name: string , yearMonthDate: string): string {
   const setting = settings.get(name);
   const s = new Sheets(setting.base_dir);
   const { data, url } = s.getData(yearMonthDate);
@@ -23,21 +23,21 @@ function getDataJson(name, yearMonthDate) {
 
 /**
  * GETリクエストを処理する
- * @param  {[type]} e [description]
+ * @param  e [description]
  */
-function doGet(e) {
+function doGet(e: any): GoogleAppsScript.HTML.HtmlOutput {
   const params = e.parameter;
   const { name, ymd } = params;
 
   let title = 'RealtimeAURecorder';
 
-  let data = { name, ymd, data: [] };
+  let data = JSON.stringify({ name, ymd, data: [] });
   if (name && ymd) {
     data = getDataJson(name, ymd);
     title = `${name} [${ymd}] - ${title}`;
   }
 
-  const template = HtmlService.createTemplateFromFile('index');
+  const template = HtmlService.createTemplateFromFile('index') as ExtendedHtmlTemplate;
   template.data = data;
   template.settings = settings.getAll();
   template.timezone = Settings.TIMEZONE;
@@ -47,11 +47,20 @@ function doGet(e) {
 }
 
 /**
+ * HtmlTemplateを継承し、属性を追加
+ */
+interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
+  data: string;
+  settings: Setting[];
+  timezone: number;
+}
+
+/**
  * Select要素のOptionのために年のリストを取得する
  * @param  {String} name アプリケーション名
  * @return {Array[]}     {name, value} の配列
  */
-function getYears(name) {
+function getYears(name: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
   const years = dataSheets.getYears();
   return years.sort((a, b) => (b.name - a.name));
@@ -59,30 +68,24 @@ function getYears(name) {
 
 /**
  * Select要素のOptionのために年月のリストを取得する
- * @param  {String} name アプリケーション名
- * @param  {String} year 年
- * @return {Array[]}     {name, value} の配列
+ * @param name アプリケーション名
+ * @param year 年
+ * @return 年月のリスト。{name, value} の配列
  */
-function getYearMonths(name, year) {
+function getYearMonths(name: string, year: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
-  const months = dataSheets.getMonthsOf(year);
+  const months = dataSheets.getMonthsOf(Number(year));
   return months.sort((a, b) => (b.name - a.name));
 }
 
 /**
  * Select要素のOptionのために年月日のリストを取得する
- * @param  {String} name      アプリケーション名
- * @param  {String} yearMonth 年月
- * @return {Array[]}     {name, value} の配列
+ * @param name      アプリケーション名
+ * @param yearMonth 年月
+ * @return 年月日のリスト。{name, value} の配列
  */
-function getYearMonthDates(name, yearMonth) {
+function getYearMonthDates(name: string, yearMonth: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
   const dates = dataSheets.getDatesOf(yearMonth);
   return dates.sort((a, b) => (b.name - a.name));
 }
-
-global.doGet = doGet;
-global.getYears = getYears;
-global.getYearMonths = getYearMonths;
-global.getYearMonthDates = getYearMonthDates;
-global.getDataJson = getDataJson;

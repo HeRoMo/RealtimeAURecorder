@@ -11,26 +11,27 @@ const Z_COLUMN_POSITION = 26;
  * このファイルには 日次で yyyy-mm-dd という名のシートを追加する。
  */
 class Sheets {
+  private baseDirId: string;
+  private baseDir: GoogleAppsScript.Drive.Folder;
   /**
    * コンストラクタ
-   * @param {String} baseDirId 結果を出力するGoogle DriveのフォルダーID
-   * @param {Integer} [dateChangeHour=DATE_CHANGE_HOUR] 日替わり時間
+   * @param baseDirId 結果を出力するGoogle DriveのフォルダーID
+   * @param dateChangeHour 日替わり時間
    */
-  constructor(baseDirId, dateChangeHour = DATE_CHANGE_HOUR) {
+  constructor(baseDirId) {
     this.baseDirId = baseDirId;
-    this.dateChangeHour = dateChangeHour;
     this.baseDir = DriveApp.getFolderById(this.baseDirId);
   }
 
   /**
    * 西暦の一覧を取得する
-   * @return {Object} {name, value}
+   * @return 西暦の一覧
    */
-  getYears() {
+  getYears(): Array<{name: number, value: string }> {
     const folders = this.baseDir.getFolders();
     const years = [];
     while (folders.hasNext()) {
-      const name = folders.next().getName();
+      const name = Number(folders.next().getName());
       years.push({ name, value: name });
     }
     return years;
@@ -38,11 +39,12 @@ class Sheets {
 
   /**
    * 指定された年の月の一覧を取得する
-   * @param  {Integer} year 西暦
-   * @return {Object}  {name, value}
+   * @param year 西暦
+   * @return 月の一覧 {name, value}
    */
-  getMonthsOf(year) {
+  getMonthsOf(year: number) {
     const yearDir = this.getYearDir(year);
+
     const folders = yearDir.getFilesByType(MimeType.GOOGLE_SHEETS);
     const yearMonths = [];
     while (folders.hasNext()) {
@@ -55,15 +57,15 @@ class Sheets {
 
   /**
    * 指定した年月の日のリストを取得する
-   * @param  {String} yearMonth yyyy-MM 形式の年月
-   * @return {[type]}           { name, value } の配列
+   * @param yearMonth yyyy-MM 形式の年月
+   * @return 年月の日のリスト
    */
-  getDatesOf(yearMonth) {
+  getDatesOf(yearMonth: string): Array<{name: number, value: string}> {
     const yearMonthFile = this.getSpreadSheetFile(yearMonth);
     const sheets = yearMonthFile.getSheets();
     let dates = sheets.map((sheet) => {
       const value = sheet.getName();
-      const name = value.split('-')[2];
+      const name = Number(value.split('-')[2]);
       const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
       return ret;
     });
@@ -73,24 +75,25 @@ class Sheets {
 
   /**
    * year に対応した名称のフォルダを取得する。なければ作る。
-   * @param  {Date}   [year=new Date().getYear()] [description]
-   * @return {Folder} 取得、あるいは生成したフォルダ
+   * @param year 西暦
+   * @return 取得、あるいは生成したフォルダ
    */
-  getYearDir(year = new Date().getYear()) {
-    const dirs = this.baseDir.getFoldersByName(year);
-    const yearDir = dirs.hasNext() ? dirs.next() : this.baseDir.createFolder(year);
+  getYearDir(year: number = new Date().getFullYear()): GoogleAppsScript.Drive.Folder {
+    const yearStr = String(year);
+    const dirs = this.baseDir.getFoldersByName(yearStr);
+    const yearDir = dirs.hasNext() ? dirs.next() : this.baseDir.createFolder(yearStr);
     return yearDir;
   }
 
   /**
    * yearMonth に対応した名称のスプレッドシートを取得する。なければ作る。
-   * @param  {String} yearMonth yyyy-mm 形式の文字列
-   * @return {SpreadSheet} 取得、あるいは生成したSpreadSheetオブジェクト
+   * @param yearMonth yyyy-mm 形式の文字列
+   * @return 取得、あるいは生成したSpreadSheetオブジェクト
    */
-  getSpreadSheetFile(yearMonth) {
-    const year = yearMonth.split('-')[0];
+  getSpreadSheetFile(yearMonth: string): GoogleAppsScript.Spreadsheet.Spreadsheet {
+    const year = Number(yearMonth.split('-')[0]);
     const yearDir = this.getYearDir(year);
-    let ssFile;
+    let ssFile: GoogleAppsScript.Spreadsheet.Spreadsheet;
     const files = yearDir.getFilesByName(yearMonth);
     if (files.hasNext()) {
       ssFile = SpreadsheetApp.open(files.next());
@@ -106,10 +109,10 @@ class Sheets {
 
   /**
    * yearMonthDateに対応した名称のシートを取得する。なければ作る。
-   * @param  {String} yearMonthDate yyyy-mm-dd 形式の文字列。
-   * @return {Sheet}  取得、もしくは作成したSheetオブジェクト
+   * @param yearMonthDate yyyy-mm-dd 形式の文字列。
+   * @return 取得、もしくは作成したSheetオブジェクト
    */
-  getSheet(yearMonthDate) {
+  getSheet(yearMonthDate: string): GoogleAppsScript.Spreadsheet.Sheet {
     if (!/([\d]{4}-[\d]{2})-[\d]{2}/.exec(yearMonthDate)) {
       throw new Error('yearMonthDate must be yyyy-mm-dd fomrmat');
     }
@@ -130,9 +133,9 @@ class Sheets {
    * データを追加する。
    * 追加先は data.datetimeの日付部分（yyyy-mm-dd）に対応するシートの末尾。
    * 日替わりの時間は DATE_CHANGE_HOUR で指定する。
-   * @param  {Object} data {datatime, activeUsers, status}
+   * @param data {datatime, activeUsers, status}
    */
-  appendData(data) {
+  appendData(data: {datetime: string, activeUsers: number, status:string}): void {
     const dateInt = Date.parse(data.datetime.replace(' ', 'T'));
     if (!dateInt) throw new Error('Invalid datetime');
     const date = new Date(dateInt);
@@ -145,10 +148,10 @@ class Sheets {
   /**
    * 指定した年月日のデータを取得する。
    * ヘッダは削除されている。
-   * @param  {String} yearMonthDate yyyy-MM-dd形式の年月日
-   * @return {Array[][]}            データ [日次, アクティブユーザ数]
+   * @param yearMonthDate yyyy-MM-dd形式の年月日
+   * @return データ [日次, アクティブユーザ数]
    */
-  getData(yearMonthDate) {
+  getData(yearMonthDate: string): { data: object[][], url: string } {
     const sheet = this.getSheet(yearMonthDate);
     const range = sheet.getDataRange();
     const data = range.getValues();

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "lib": ["es2015"],
+    "target": "es3",
+    "noImplicitUseStrict": true,
+    "noLib": true,
+    "experimentalDecorators": true,
+    "noResolve": true,
+    "pretty": true,
+    "typeRoots": [
+      "@types",
+      "./types"
+    ]
+  },
+  "include": [
+    "src/*.ts",
+    "src/**/*.ts",
+    "test/*.ts",
+    "test/**/*.ts"
+  ],
+}

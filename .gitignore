@@ -3,6 +3,3 @@ node_modules
 
 # @google/clasp
 .clasp.json
-
-# webpack+babel
-dest

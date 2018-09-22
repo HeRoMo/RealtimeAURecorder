@@ -1,13 +1,13 @@
-import Settings from './settings';
-import fetchActiveUsers from './ga';
+import Settings, {Setting} from './app_settings';
+import getActiveUsers from './ga';
 import Sheets from './sheets';
 
 /**
  * 設定された1つのサイトのデータを処理する
- * @param  {Object} setting 1件分の設定。
+ * @param setting 1件分の設定。
  */
-function recordAU(setting) {
-  const auData = fetchActiveUsers(setting.ga_view_id);
+function recordAU(setting: Setting): void {
+  const auData = getActiveUsers(setting.ga_view_id);
   const baseDirId = setting.base_dir;
   const sheet = new Sheets(baseDirId);
   sheet.appendData(auData);
@@ -28,6 +28,3 @@ function recordAUAll() {
 function setUp() {
   Settings.setUp();
 }
-
-global.recordAUAll = recordAUAll;
-global.setUp = setUp;
