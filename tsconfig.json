@@ -5,19 +5,16 @@
     "lib": ["es2015"],
     "target": "es3",
     "noImplicitUseStrict": true,
-    "noLib": true,
+    // "noLib": true,
     "experimentalDecorators": true,
-    "noResolve": true,
-    "pretty": true,
-    "typeRoots": [
-      "@types",
-      "./types"
-    ]
+    // "noResolve": true,
+    "pretty": true
   },
   "include": [
+    "types/*.d.ts",
     "src/*.ts",
     "src/**/*.ts",
     "test/*.ts",
     "test/**/*.ts"
-  ],
+  ]
 }
