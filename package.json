@@ -26,7 +26,9 @@
   "author": "HeRoMo",
   "repository": "https://github.com/HeRoMo/RealtimeAURecorder",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@types/google-apps-script": "0.0.28"
+  },
   "devDependencies": {
     "@google/clasp": "^1.5.3",
     "babel-core": "^6.26.0",
@@ -39,8 +41,8 @@
     "eslint-plugin-googleappsscript": "^1.0.0",
     "eslint-plugin-import": "^2.9.0",
     "gas-webpack-plugin": "^0.2.1",
-    "webpack": "^3.11.0",
     "gts": "^0.8.0",
-    "typescript": "~2.8.0"
+    "typescript": "^2.9.2",
+    "webpack": "^3.11.0"
   }
 }
