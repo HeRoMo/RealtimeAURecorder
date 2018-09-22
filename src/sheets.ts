@@ -154,8 +154,9 @@ class Sheets {
   getData(yearMonthDate: string): { data: object[][], url: string } {
     const sheet = this.getSheet(yearMonthDate);
     const range = sheet.getDataRange();
-    const data = range.getValues();
+    let data = range.getValues();
     data.shift();
+    data = data.filter((d) => d[2] !== 'ERROR');
     const refinedData = data.map(row => row.slice(0, 2));
     const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`;
     return { data: refinedData, url };
