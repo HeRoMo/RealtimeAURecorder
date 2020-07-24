@@ -45,6 +45,17 @@ class Settings {
   static setUp(): void {
     const scriptProperties = PropertiesService.getScriptProperties();
     scriptProperties.setProperty(Settings.PROP_KEY_SSID, SpreadsheetApp.getActiveSpreadsheet().getId());
+    this.initSettingsSheet();
+  }
+
+  /**
+   * SETTINGS を作成する
+   */
+  private static initSettingsSheet() {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.insertSheet(Settings.SETTINGS_SHEET_NAME, 0);
+    const range = sheet.getRange('A1:C1');
+    range.setValues([['name', 'ga_view_id', 'base_dir']]);
   }
 
   /**
