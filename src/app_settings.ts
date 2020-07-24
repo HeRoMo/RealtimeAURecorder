@@ -1,16 +1,15 @@
-
 export interface Setting {
   name: string;
-  ga_view_id: string;
-  base_dir: string;
+  ga_view_id: string; // eslint-disable-line @typescript-eslint/naming-convention
+  base_dir: string; // eslint-disable-line @typescript-eslint/naming-convention
 }
 
 /**
  * Setting のType Guard関数
  * @param value
  */
-function isSetting(value: object): value is Setting {
-  return value['name'] && value['ga_view_id'] && value['base_dir'];
+function isSetting(value: any): value is Setting {
+  return value.name && value.ga_view_id && value.base_dir;
 }
 /**
  * Range#getValues で取得した2次元配列をオブジェクトの配列に変換する。
@@ -26,8 +25,9 @@ function values2object(values: object[][]): Setting[] {
     row.forEach((val: object, index: number) => {
       obj[keys[index]] = val;
     });
-    if(isSetting(obj)) return obj;
-  });
+    if (isSetting(obj)) return obj;
+    return null;
+  }).filter((elm) => elm);
 }
 
 class Settings {
@@ -36,6 +36,7 @@ class Settings {
   static readonly PROP_KEY_SSID = 'settingsSsId';
 
   private settingData: Setting[];
+  private ss: GoogleAppsScript.Spreadsheet.Spreadsheet;
   /**
    * セットアップメソッド
    * 設定ファイルからスクリプトエディタを開き、一度実行すると、スクリプトプロパティに
@@ -43,7 +44,19 @@ class Settings {
    */
   static setUp(): void {
     const scriptProperties = PropertiesService.getScriptProperties();
-    scriptProperties.setProperty(Settings.PROP_KEY_SSID, SpreadsheetApp.getActiveSpreadsheet().getId());
+    const activeSSID = SpreadsheetApp.getActiveSpreadsheet().getId();
+    scriptProperties.setProperty(Settings.PROP_KEY_SSID, activeSSID);
+    this.initSettingsSheet();
+  }
+
+  /**
+   * SETTINGS を作成する
+   */
+  private static initSettingsSheet() {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.insertSheet(Settings.SETTINGS_SHEET_NAME, 0);
+    const range = sheet.getRange('A1:C1');
+    range.setValues([['name', 'ga_view_id', 'base_dir']]);
   }
 
   /**
@@ -51,15 +64,11 @@ class Settings {
    * @return 設定のリスト
    */
   constructor(ssId = Settings.getSettingsSsId()) {
-    let ss: GoogleAppsScript.Spreadsheet.Spreadsheet;
     if (ssId) {
-      ss = SpreadsheetApp.openById(ssId);
+      this.ss = SpreadsheetApp.openById(ssId);
     } else {
-      ss = SpreadsheetApp.getActiveSpreadsheet();
+      this.ss = SpreadsheetApp.getActiveSpreadsheet();
     }
-    const settingSheet = ss.getSheetByName(Settings.SETTINGS_SHEET_NAME);
-    const values = settingSheet.getDataRange().getValues();
-    this.settingData = values2object(values);
   }
 
   /**
@@ -67,6 +76,11 @@ class Settings {
    * @return Settingの配列
    */
   getAll(): Setting[] {
+    if (!this.settingData) {
+      const settingSheet = this.ss.getSheetByName(Settings.SETTINGS_SHEET_NAME);
+      const values = settingSheet.getDataRange().getValues();
+      this.settingData = values2object(values);
+    }
     return this.settingData;
   }
 
@@ -76,7 +90,7 @@ class Settings {
    * @return
    */
   get(name: string): Setting {
-    const setting = this.settingData.filter(elm => elm.name === name)[0];
+    const setting = this.getAll().filter((elm) => elm.name === name)[0];
     return setting;
   }
 

@@ -20,4 +20,4 @@ function getActiveUsers(ids: string): { datetime: string, activeUsers: number, s
   return { datetime, activeUsers, status };
 }
 
-export default getActiveUsers
+export default getActiveUsers;

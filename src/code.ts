@@ -1,4 +1,4 @@
-import Settings, {Setting} from './app_settings';
+import Settings, { Setting } from './app_settings';
 import getActiveUsers from './ga';
 import Sheets from './sheets';
 
@@ -17,14 +17,14 @@ function recordAU(setting: Setting): void {
  * すべての設定のデータを処理し、アクティブユーザを記録する。
  * 定期的に実行することを想定。
  */
-function recordAUAll() {
+function recordAUAll() { // eslint-disable-line @typescript-eslint/no-unused-vars
   const settings = new Settings().getAll();
-  settings.forEach(setting => recordAU(setting));
+  settings.forEach((setting) => recordAU(setting));
 }
 
 /**
  * ScriptPropertyにコンテナドキュメントのIDを保存する。
  */
-function setUp() {
+function setUp() { // eslint-disable-line @typescript-eslint/no-unused-vars
   Settings.setUp();
 }

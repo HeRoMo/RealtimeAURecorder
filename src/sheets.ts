@@ -69,7 +69,7 @@ class Sheets {
       const ret = /[\d]{4}-[\d]{2}-[\d]{2}/.test(value) ? { name, value } : null;
       return ret;
     });
-    dates = dates.filter(value => !!value);
+    dates = dates.filter((value) => !!value);
     return dates;
   }
 
@@ -157,7 +157,7 @@ class Sheets {
     let data = range.getValues();
     data.shift();
     data = data.filter((d) => d[2] !== 'ERROR');
-    const refinedData = data.map(row => row.slice(0, 2));
+    const refinedData = data.map((row) => row.slice(0, 2));
     const url = `${sheet.getParent().getUrl()}#gid=${sheet.getSheetId()}`;
     return { data: refinedData, url };
   }

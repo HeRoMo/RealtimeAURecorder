@@ -4,10 +4,12 @@
   "description": "A Google Apps Script application to record realtime active users from Google Analytics.",
   "main": "index.js",
   "scripts": {
-    "login": "./node_modules/.bin/clasp login",
-    "init_gas": "./node_modules/.bin/clasp create RealtimeAuRecorder",
-    "postinit_gas": "node ./utils/modify_clasp_json.js && rm ./appsscript.json",
-    "deploy": "./node_modules/.bin/clasp push"
+    "eslint": "eslint . --ext .ts",
+    "clasp": "clasp",
+    "clasp:login": "clasp login",
+    "clasp:create": "clasp create --type sheets --rootDir ./src --title RealtimeAuRecorder",
+    "clasp:open": "clasp open",
+    "clasp:push": "clasp push"
   },
   "keywords": [
     "gas",
@@ -19,8 +21,13 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@google/clasp": "^1.5.3",
-    "@types/google-apps-script": "0.0.28",
-    "typescript": "^2.9.2"
+    "@google/clasp": "^2.3.0",
+    "@types/google-apps-script": "^1.0.14",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-googleappsscript": "^1.0.3",
+    "eslint-plugin-import": "^2.22.0"
   }
 }
