@@ -4,10 +4,11 @@
   "description": "A Google Apps Script application to record realtime active users from Google Analytics.",
   "main": "index.js",
   "scripts": {
-    "login": "./node_modules/.bin/clasp login",
-    "init_gas": "./node_modules/.bin/clasp create RealtimeAuRecorder",
-    "postinit_gas": "node ./utils/modify_clasp_json.js && rm ./appsscript.json",
-    "deploy": "./node_modules/.bin/clasp push"
+    "clasp": "clasp",
+    "clasp:login": "clasp login",
+    "clasp:create": "clasp create --type sheets --rootDir ./src --title RealtimeAuRecorder",
+    "clasp:open": "clasp open",
+    "clasp:push": "clasp push"
   },
   "keywords": [
     "gas",
