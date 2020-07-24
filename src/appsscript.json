@@ -7,5 +7,10 @@
       "version": "v3"
     }]
   },
-  "exceptionLogging": "STACKDRIVER"
+  "webapp": {
+    "access": "DOMAIN",
+    "executeAs": "USER_ACCESSING"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
 }
