@@ -36,6 +36,7 @@ class Settings {
   static readonly PROP_KEY_SSID = 'settingsSsId';
 
   private settingData: Setting[];
+  private ss: GoogleAppsScript.Spreadsheet.Spreadsheet;
   /**
    * セットアップメソッド
    * 設定ファイルからスクリプトエディタを開き、一度実行すると、スクリプトプロパティに
@@ -51,15 +52,11 @@ class Settings {
    * @return 設定のリスト
    */
   constructor(ssId = Settings.getSettingsSsId()) {
-    let ss: GoogleAppsScript.Spreadsheet.Spreadsheet;
     if (ssId) {
-      ss = SpreadsheetApp.openById(ssId);
+      this.ss = SpreadsheetApp.openById(ssId);
     } else {
-      ss = SpreadsheetApp.getActiveSpreadsheet();
+      this.ss = SpreadsheetApp.getActiveSpreadsheet();
     }
-    const settingSheet = ss.getSheetByName(Settings.SETTINGS_SHEET_NAME);
-    const values = settingSheet.getDataRange().getValues();
-    this.settingData = values2object(values);
   }
 
   /**
@@ -67,6 +64,11 @@ class Settings {
    * @return Settingの配列
    */
   getAll(): Setting[] {
+    if (!this.settingData) {
+      const settingSheet = this.ss.getSheetByName(Settings.SETTINGS_SHEET_NAME);
+      const values = settingSheet.getDataRange().getValues();
+      this.settingData = values2object(values);
+    }
     return this.settingData;
   }
 
@@ -76,7 +78,7 @@ class Settings {
    * @return
    */
   get(name: string): Setting {
-    const setting = this.settingData.filter(elm => elm.name === name)[0];
+    const setting = this.getAll().filter(elm => elm.name === name)[0];
     return setting;
   }
 
