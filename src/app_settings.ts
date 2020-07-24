@@ -1,16 +1,15 @@
-
 export interface Setting {
   name: string;
-  ga_view_id: string;
-  base_dir: string;
+  ga_view_id: string; // eslint-disable-line @typescript-eslint/naming-convention
+  base_dir: string; // eslint-disable-line @typescript-eslint/naming-convention
 }
 
 /**
  * Setting のType Guard関数
  * @param value
  */
-function isSetting(value: object): value is Setting {
-  return value['name'] && value['ga_view_id'] && value['base_dir'];
+function isSetting(value: any): value is Setting {
+  return value.name && value.ga_view_id && value.base_dir;
 }
 /**
  * Range#getValues で取得した2次元配列をオブジェクトの配列に変換する。
@@ -26,8 +25,9 @@ function values2object(values: object[][]): Setting[] {
     row.forEach((val: object, index: number) => {
       obj[keys[index]] = val;
     });
-    if(isSetting(obj)) return obj;
-  });
+    if (isSetting(obj)) return obj;
+    return null;
+  }).filter((elm) => elm);
 }
 
 class Settings {
@@ -44,7 +44,8 @@ class Settings {
    */
   static setUp(): void {
     const scriptProperties = PropertiesService.getScriptProperties();
-    scriptProperties.setProperty(Settings.PROP_KEY_SSID, SpreadsheetApp.getActiveSpreadsheet().getId());
+    const activeSSID = SpreadsheetApp.getActiveSpreadsheet().getId();
+    scriptProperties.setProperty(Settings.PROP_KEY_SSID, activeSSID);
     this.initSettingsSheet();
   }
 
@@ -89,7 +90,7 @@ class Settings {
    * @return
    */
   get(name: string): Setting {
-    const setting = this.getAll().filter(elm => elm.name === name)[0];
+    const setting = this.getAll().filter((elm) => elm.name === name)[0];
     return setting;
   }
 

@@ -9,7 +9,7 @@ const settings = new Settings();
  * @param yearMonthDate yyyy-MM-dd形式の年月日
  * @return JSON.stringifyしたスプレッドシートデータ
  */
-function getDataJson(name: string , yearMonthDate: string): string {
+function getDataJson(name: string, yearMonthDate: string): string {
   const setting = settings.get(name);
   const s = new Sheets(setting.base_dir);
   const { data, url } = s.getData(yearMonthDate);
@@ -25,6 +25,7 @@ function getDataJson(name: string , yearMonthDate: string): string {
  * GETリクエストを処理する
  * @param  e [description]
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function doGet(e: any): GoogleAppsScript.HTML.HtmlOutput {
   const params = e.parameter;
   const { name, ymd } = params;
@@ -60,6 +61,7 @@ interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
  * @param  {String} name アプリケーション名
  * @return {Array[]}     {name, value} の配列
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getYears(name: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
   const years = dataSheets.getYears();
@@ -72,6 +74,7 @@ function getYears(name: string): Array<{name: number, value: string}> {
  * @param year 年
  * @return 年月のリスト。{name, value} の配列
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getYearMonths(name: string, year: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
   const months = dataSheets.getMonthsOf(Number(year));
@@ -84,6 +87,7 @@ function getYearMonths(name: string, year: string): Array<{name: number, value: 
  * @param yearMonth 年月
  * @return 年月日のリスト。{name, value} の配列
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getYearMonthDates(name: string, yearMonth: string): Array<{name: number, value: string}> {
   const dataSheets = new Sheets(settings.get(name).base_dir);
   const dates = dataSheets.getDatesOf(yearMonth);
