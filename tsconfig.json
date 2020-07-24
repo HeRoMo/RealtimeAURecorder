@@ -1,20 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
-    "lib": ["es2015"],
-    "target": "es3",
-    "noImplicitUseStrict": true,
-    // "noLib": true,
-    "experimentalDecorators": true,
-    // "noResolve": true,
-    "pretty": true
-  },
-  "include": [
-    "types/*.d.ts",
-    "src/*.ts",
-    "src/**/*.ts",
-    "test/*.ts",
-    "test/**/*.ts"
-  ]
+    "lib": ["ES2019"],
+    "experimentalDecorators": true
+  }
 }
