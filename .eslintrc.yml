@@ -8,9 +8,8 @@ extends:
   - plugin:import/warnings
   - plugin:import/typescript # this line does the trick
 globals:
-  Atomics: readonly
+  GoogleAppsScript: readonly
   SharedArrayBuffer: readonly
-  Todoist: readonly
 parser: '@typescript-eslint/parser'
 parserOptions:
   ecmaVersion: 2018
