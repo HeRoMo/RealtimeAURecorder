@@ -1,5 +1,5 @@
 import Settings, { Setting } from './app_settings';
-import getActiveUsers from './ga';
+import { GaClient } from './GaClient';
 import Sheets from './sheets';
 
 /**
@@ -7,7 +7,7 @@ import Sheets from './sheets';
  * @param setting 1件分の設定。
  */
 function recordAU(setting: Setting): void {
-  const auData = getActiveUsers(setting.ga_view_id);
+  const auData = GaClient.getActiveUsers(setting.ga_view_id);
   const baseDirId = setting.base_dir;
   const sheet = new Sheets(baseDirId);
   sheet.appendData(auData);
