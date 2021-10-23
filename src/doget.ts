@@ -4,6 +4,15 @@ import Sheets from './sheets';
 const settings = new Settings();
 
 /**
+ * HtmlTemplateを継承し、属性を追加
+ */
+ interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
+  data: string;
+  settings: Setting[];
+  timezone: number;
+}
+
+/**
  * JSON.stringifyしたスプレッドシートからデータを取得する
  * @param name          [description]
  * @param yearMonthDate yyyy-MM-dd形式の年月日
@@ -45,15 +54,6 @@ function doGet(e: any): GoogleAppsScript.HTML.HtmlOutput {
   const htmloutput = template.evaluate();
   htmloutput.setTitle(title);
   return htmloutput;
-}
-
-/**
- * HtmlTemplateを継承し、属性を追加
- */
-interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
-  data: string;
-  settings: Setting[];
-  timezone: number;
 }
 
 /**
