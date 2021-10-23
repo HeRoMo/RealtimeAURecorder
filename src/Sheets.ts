@@ -18,7 +18,7 @@ class Sheets {
    * @param baseDirId 結果を出力するGoogle DriveのフォルダーID
    * @param dateChangeHour 日替わり時間
    */
-  constructor(baseDirId) {
+  constructor(baseDirId: string) {
     this.baseDirId = baseDirId;
     this.baseDir = DriveApp.getFolderById(this.baseDirId);
   }
@@ -44,8 +44,7 @@ class Sheets {
    */
   getMonthsOf(year: number) {
     const yearDir = this.getYearDir(year);
-
-    const folders = yearDir.getFilesByType(MimeType.GOOGLE_SHEETS);
+    const folders = yearDir.getFilesByType(MimeType.GOOGLE_SHEETS.toString());
     const yearMonths = [];
     while (folders.hasNext()) {
       const value = folders.next().getName();
