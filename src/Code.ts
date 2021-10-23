@@ -1,6 +1,6 @@
-import Settings, { Setting } from './app_settings';
+import AppSettings, { Setting } from './AppSettings';
 import { GaClient } from './GaClient';
-import Sheets from './sheets';
+import Sheets from './Sheets';
 
 /**
  * 設定された1つのサイトのデータを処理する
@@ -18,7 +18,7 @@ function recordAU(setting: Setting): void {
  * 定期的に実行することを想定。
  */
 function recordAUAll() { // eslint-disable-line @typescript-eslint/no-unused-vars
-  const settings = new Settings().getAll();
+  const settings = new AppSettings().getAll();
   settings.forEach((setting) => recordAU(setting));
 }
 
@@ -26,5 +26,5 @@ function recordAUAll() { // eslint-disable-line @typescript-eslint/no-unused-var
  * ScriptPropertyにコンテナドキュメントのIDを保存する。
  */
 function setUp() { // eslint-disable-line @typescript-eslint/no-unused-vars
-  Settings.setUp();
+  AppSettings.setUp();
 }

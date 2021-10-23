@@ -30,7 +30,7 @@ function values2object(values: object[][]): Setting[] {
   }).filter((elm) => elm);
 }
 
-class Settings {
+class AppSettings {
   static readonly TIMEZONE = 9;
   static readonly SETTINGS_SHEET_NAME = 'SETTINGS';
   static readonly PROP_KEY_SSID = 'settingsSsId';
@@ -45,7 +45,7 @@ class Settings {
   static setUp(): void {
     const scriptProperties = PropertiesService.getScriptProperties();
     const activeSSID = SpreadsheetApp.getActiveSpreadsheet().getId();
-    scriptProperties.setProperty(Settings.PROP_KEY_SSID, activeSSID);
+    scriptProperties.setProperty(AppSettings.PROP_KEY_SSID, activeSSID);
     this.initSettingsSheet();
   }
 
@@ -54,7 +54,7 @@ class Settings {
    */
   private static initSettingsSheet() {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.insertSheet(Settings.SETTINGS_SHEET_NAME, 0);
+    const sheet = ss.insertSheet(AppSettings.SETTINGS_SHEET_NAME, 0);
     const range = sheet.getRange('A1:C1');
     range.setValues([['name', 'ga_view_id', 'base_dir']]);
   }
@@ -63,7 +63,7 @@ class Settings {
    * 設定を取得する。
    * @return 設定のリスト
    */
-  constructor(ssId = Settings.getSettingsSsId()) {
+  constructor(ssId = AppSettings.getSettingsSsId()) {
     if (ssId) {
       this.ss = SpreadsheetApp.openById(ssId);
     } else {
@@ -77,7 +77,7 @@ class Settings {
    */
   getAll(): Setting[] {
     if (!this.settingData) {
-      const settingSheet = this.ss.getSheetByName(Settings.SETTINGS_SHEET_NAME);
+      const settingSheet = this.ss.getSheetByName(AppSettings.SETTINGS_SHEET_NAME);
       const values = settingSheet.getDataRange().getValues();
       this.settingData = values2object(values);
     }
@@ -100,8 +100,8 @@ class Settings {
    */
   static getSettingsSsId(): string {
     const scriptProperties = PropertiesService.getScriptProperties();
-    return scriptProperties.getProperty(Settings.PROP_KEY_SSID);
+    return scriptProperties.getProperty(AppSettings.PROP_KEY_SSID);
   }
 }
 
-export default Settings;
+export default AppSettings;

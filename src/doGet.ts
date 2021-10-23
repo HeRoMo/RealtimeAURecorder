@@ -1,12 +1,12 @@
-import Settings, { Setting } from './app_settings';
-import Sheets from './sheets';
+import AppSettings, { Setting } from './AppSettings';
+import Sheets from './Sheets';
 
-const settings = new Settings();
+const settings = new AppSettings();
 
 /**
  * HtmlTemplateを継承し、属性を追加
  */
- interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
+interface ExtendedHtmlTemplate extends GoogleAppsScript.HTML.HtmlTemplate {
   data: string;
   settings: Setting[];
   timezone: number;
@@ -50,7 +50,7 @@ function doGet(e: any): GoogleAppsScript.HTML.HtmlOutput {
   const template = HtmlService.createTemplateFromFile('index') as ExtendedHtmlTemplate;
   template.data = data;
   template.settings = settings.getAll();
-  template.timezone = Settings.TIMEZONE;
+  template.timezone = AppSettings.TIMEZONE;
   const htmloutput = template.evaluate();
   htmloutput.setTitle(title);
   return htmloutput;
