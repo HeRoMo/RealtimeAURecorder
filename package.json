@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@google/clasp": "2.4.1",
+    "@google/clasp": "2.4.2",
     "@types/google-apps-script": "1.0.55",
     "@typescript-eslint/eslint-plugin": "5.37.0",
     "@typescript-eslint/parser": "5.37.0",
