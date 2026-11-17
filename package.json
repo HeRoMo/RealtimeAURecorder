@@ -23,8 +23,8 @@
   "devDependencies": {
     "@google/clasp": "3.4.1",
     "@types/google-apps-script": "2.0.15",
-    "@typescript-eslint/eslint-plugin": "8.72.2",
-    "@typescript-eslint/parser": "8.72.2",
+    "@typescript-eslint/eslint-plugin": "8.73.0",
+    "@typescript-eslint/parser": "8.73.0",
     "eslint": "10.15.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-googleappsscript": "1.0.5",
